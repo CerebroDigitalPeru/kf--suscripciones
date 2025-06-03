@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -86,6 +86,21 @@
                         </div>
                         <div class="h-8 w-8 text-purple-200">📅</div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aviso importante -->
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <span class="text-yellow-500">⚠️</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        <strong>Importante:</strong> Los datos se mantienen mientras tengas esta pestaña abierta. 
+                        Para guardar permanentemente, usa el botón "Exportar" regularmente.
+                    </p>
                 </div>
             </div>
         </div>
@@ -212,7 +227,7 @@
     </div>
 
     <script>
-        // Variables globales
+        // Variables globales - almacenamiento en memoria
         let subscriptions = [];
         let editingId = null;
 
@@ -223,32 +238,51 @@
             'mensual': 'Mensual'
         };
 
-        // Cargar datos al iniciar
+        // Inicializar cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
-            loadData();
             updateDisplay();
+            
+            // Crear datos de ejemplo si está vacío
+            if (subscriptions.length === 0) {
+                createSampleData();
+            }
         });
 
-        // Función para cargar datos
-        function loadData() {
-            try {
-                const saved = localStorage.getItem('florist-subscriptions');
-                if (saved) {
-                    subscriptions = JSON.parse(saved);
+        // Crear datos de ejemplo
+        function createSampleData() {
+            const sampleSubscriptions = [
+                {
+                    id: 1,
+                    clientName: "María García",
+                    email: "maria.garcia@email.com",
+                    phone: "987 654 321",
+                    address: "Av. Javier Prado 1234, San Isidro",
+                    flowerType: "Rosas",
+                    frequency: "semanal",
+                    price: "45.00",
+                    startDate: "2025-06-01",
+                    status: "activa",
+                    notes: "Prefiere rosas rojas. Entregar viernes 2-4 PM",
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    clientName: "Carlos López",
+                    email: "carlos.lopez@email.com",
+                    phone: "956 123 789",
+                    address: "Jr. Las Flores 567, Miraflores",
+                    flowerType: "Girasoles",
+                    frequency: "quincenal",
+                    price: "60.00",
+                    startDate: "2025-06-03",
+                    status: "activa",
+                    notes: "Bouquet grande para oficina",
+                    createdAt: new Date().toISOString()
                 }
-            } catch (error) {
-                console.error('Error loading data:', error);
-                subscriptions = [];
-            }
-        }
-
-        // Función para guardar datos
-        function saveData() {
-            try {
-                localStorage.setItem('florist-subscriptions', JSON.stringify(subscriptions));
-            } catch (error) {
-                console.error('Error saving data:', error);
-            }
+            ];
+            
+            subscriptions = sampleSubscriptions;
+            updateDisplay();
         }
 
         // Función para exportar datos
@@ -262,6 +296,7 @@
                 link.download = `suscripciones-floreria-${new Date().toISOString().split('T')[0]}.json`;
                 link.click();
                 URL.revokeObjectURL(url);
+                alert('Datos exportados correctamente');
             } catch (error) {
                 alert('Error al exportar datos: ' + error.message);
             }
@@ -278,7 +313,6 @@
                     const importedData = JSON.parse(e.target.result);
                     if (Array.isArray(importedData)) {
                         subscriptions = importedData;
-                        saveData();
                         updateDisplay();
                         alert('Datos importados correctamente');
                     } else {
@@ -400,7 +434,6 @@
                 });
             }
 
-            saveData();
             updateDisplay();
             closeForm();
         }
@@ -409,7 +442,6 @@
         function deleteSubscription(id) {
             if (confirm('¿Estás seguro de que quieres eliminar esta suscripción?')) {
                 subscriptions = subscriptions.filter(sub => sub.id !== id);
-                saveData();
                 updateDisplay();
             }
         }
